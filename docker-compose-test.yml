@@ -1,0 +1,6 @@
+services:
+  api-test:
+    build:
+      context: .
+      target: test
+    env_file: .env.test
