@@ -1,42 +1,17 @@
 DEFAULT_GOAL := build
+include .env.dev
 
-run:
-	@echo "🦦🏃‍♂️ Starting Project..."
-	@go run ./cmd/api/main.go
+COMPOSE_DEV = docker compose -f docker-compose.yml --env-file .env.dev
+COMPOSE_PROD = docker compose -f docker-compose-prod.yml --env-file .env.prod
 
-build:
-	@echo "🛠 Building Project..."
-	@go build ./cmd/api/main.go
+dev-up:
+	@$(COMPOSE_DEV) up -d db api
 
-db-up:
-	@echo "🍃🔓 Starting database..."
+dev-down:
+	@$(COMPOSE_DEV) down
 
-db-down:
-	@echo "🍃🔒 Closing database..."
+migrate-up:
+	@$(COMPOSE_DEV) run --rm migrator -path=/migrations -database="$(DATABASE_URL)" up
 
-db-down-rm:
-	@echo "🍃🔒 Closing database and removing directory..."
-
-api-dev-up:
-	@echo "🐳 Running docker backend container..."
-	@docker compose up --build
-
-api-dev-down:
-	@echo "🐳 Stopping docker backend container..."
-	@docker compose down
-
-api-test-up:
-	@echo "🐳 Running docker backend container..."
-	@docker compose -f docker-compose-test.yml up --build --exit-code-from api-test
-
-api-test-down:
-	@echo "🐳 Stopping docker backend container..."
-	@docker compose down
-
-api-pro-up:
-	@echo "🐳 Running docker backend container..."
-	@docker compose -f docker-compose-prod.yml up -d --build
-
-api-pro-down:
-	@echo "🐳 Stopping docker backend container..."
-	@docker compose down
+migrate-down:
+	@$(COMPOSE_DEV) run --rm migrator -path=/migrations -database="$(DATABASE_URL)" down 1

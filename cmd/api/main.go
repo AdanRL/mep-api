@@ -2,18 +2,23 @@ package main
 
 import (
 	"log"
+	"mep-api/config"
 	"net/http"
-
-	"mep-api/internal/config"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 
 func main() {
-  cfg := config.Load()
-	log.Printf("[INIT] Starting MiseEnPlace API in '%s' mode...", cfg.AppEnv)
+  if len(os.Args) < 2 {
+    log.Fatal("[FATAL] Please provide the path to the .env file as a command-line argument.")
+  }
+  log.Printf("[INFO] Using file: %s", os.Args[1])
+  envFile := os.Args[1]
+  cfg := config.Load(envFile)
 
+  log.Printf("[INIT] Starting MiseEnPlace API in '%s' mode...", cfg.AppEnv)
   router := gin.Default()
   router.SetTrustedProxies(nil)
 
@@ -23,7 +28,8 @@ func main() {
       })
   })
 
-	if err := router.Run(cfg.BackendPort); err != nil {
-			log.Fatalf("[FATAL] Failed to start server on %s: %v", cfg.BackendPort, err)
-		}
+  if err := router.Run(cfg.BackendPort); err != nil {
+      log.Fatalf("[FATAL] Failed to start server on %s: %v", cfg.BackendPort, err)
+    }
+
 }

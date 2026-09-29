@@ -1,37 +1,54 @@
 services:
+
   db:
     image: mysql:8.4
     container_name: mep_mysql
     restart: always
-    env_file: .env.dev
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env.dev
+
     ports:
       - "3306:3306"
+
     volumes:
       - mysql_data:/var/lib/mysql
+
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  migrator:
+    image: migrate/migrate
+    container_name: mep_migrator
+
+    volumes:
+      - ./migrations:/migrations
+
+    depends_on:
+      db:
+        condition: service_healthy
+
   api:
+    container_name: mep_api
+
     build:
       context: .
       target: dev
-    env_file: .env.dev
+
+    env_file:
+      - .env.dev
+
     ports:
       - "8080:8080"
+
     volumes:
       - .:/app
+
     depends_on:
-        db:
-          condition: service_healthy
+      db:
+        condition: service_healthy
 
 volumes:
   mysql_data:
-
