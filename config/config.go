@@ -10,20 +10,20 @@ import (
 type Config struct {
 	AppEnv      string
 	BackendPort string
-  MySQLHost   string
-  MySQLPort   string
-  MySQLUser   string
-  MySQLPass   string
-  MySQLDB     string
+	MySQLHost   string
+	MySQLPort   string
+	MySQLUser   string
+	MySQLPass   string
+	MySQLDB     string
 }
 
 func Load(envFile string) *Config {
 
 	if err := godotenv.Load(envFile); err != nil {
-    if os.Getenv("APP_ENV") == "prod" {
-      log.Println("[INFO] Running in production mode. Using system environment variables.")
-    }
-  }
+		if os.Getenv("APP_ENV") == "prod" {
+			log.Println("[INFO] Running in production mode. Using system environment variables.")
+		}
+	}
 
 	return &Config{
 		AppEnv:      mustGetVal("APP_ENV"),

@@ -21,7 +21,7 @@ func cleanDynamicTables(db *sql.DB) {
 	db.Exec("TRUNCATE TABLE ingredients")
 	db.Exec("TRUNCATE TABLE user_roles")
 	db.Exec("TRUNCATE TABLE users")
-  db.Exec("TRUNCATE TABLE roles")
+	db.Exec("TRUNCATE TABLE roles")
 
 	db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 
@@ -29,15 +29,15 @@ func cleanDynamicTables(db *sql.DB) {
 }
 
 func main() {
-  err := godotenv.Load()
+	err := godotenv.Load()
 	if err != nil {
 		log.Println("Warning: No .env file found. Using environment variables.")
 	}
-  user := os.Getenv("DB_USER")
-  password := os.Getenv("DB_PASSWORD")
-  host := os.Getenv("DB_HOST")
-  port := os.Getenv("DB_PORT")
-  dbName := os.Getenv("DB_NAME")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, password, host, port, dbName)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -51,14 +51,14 @@ func main() {
 
 	gofakeit.Seed(0)
 
-  cleanDynamicTables(db)
+	cleanDynamicTables(db)
 
 	seedRoles(db)
 	seedCategories(db)
 	seedAllergens(db)
 	seedTables(db)
 	seedUsers(db, 15)
-  ingredientIDs := seedIngredients(db)
+	ingredientIDs := seedIngredients(db)
 	seedDishes(db, ingredientIDs)
 
 	log.Println("✅ Database seeding completed successfully.")
@@ -105,9 +105,9 @@ func seedTables(db *sql.DB) {
 }
 
 func seedUsers(db *sql.DB, count int) {
-  plainPassword := os.Getenv("MYSQL_USERS_APP_PASSWORD")
+	plainPassword := os.Getenv("MYSQL_USERS_APP_PASSWORD")
 
-  hashedBytes, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
 	if err != nil {
 		log.Fatalf("Error generando el hash de la contraseña: %v", err)
 	}
@@ -133,9 +133,9 @@ func seedUsers(db *sql.DB, count int) {
 }
 
 func seedIngredients(db *sql.DB) map[string]int64 {
-  ingredientIDs := make(map[string]int64)
+	ingredientIDs := make(map[string]int64)
 
-  ingredients := []struct {
+	ingredients := []struct {
 		Name  string
 		Unit  string
 		Stock float64
@@ -158,7 +158,7 @@ func seedIngredients(db *sql.DB) map[string]int64 {
 		{"Brownie", "UNITS", 50, 10},
 	}
 
-  for _, ing := range ingredients {
+	for _, ing := range ingredients {
 		res, err := db.Exec(
 			"INSERT INTO ingredients (name, unit_of_measure, current_stock, minimum_stock) VALUES (?, ?, ?, ?)",
 			ing.Name, ing.Unit, ing.Stock, ing.Min,
@@ -169,11 +169,11 @@ func seedIngredients(db *sql.DB) map[string]int64 {
 		}
 	}
 	log.Printf("🔹 %d Ingredients inserted.", len(ingredients))
-  return ingredientIDs
+	return ingredientIDs
 }
 
 func seedDishes(db *sql.DB, ingredientIDs map[string]int64) {
-  dishes := []struct {
+	dishes := []struct {
 		Name       string
 		CategoryID int
 		Price      float64
